@@ -9,13 +9,16 @@
         },
         {
             "name": "Mhike Funderburk"
+        },
+        {
+            "name": "Chris Hutto"
         }
     ],
     "package_name": "phantom_slack",
     "type": "information",
     "license": "Copyright (c) 2016-2026 Splunk Inc.",
     "main_module": "slack_connector.py",
-    "app_version": "2.10.6",
+    "app_version": "2.11.0",
     "utctime_updated": "2026-09-30T00:11:03.398480Z",
     "product_vendor": "Slack Technologies",
     "product_name": "Slack",
@@ -4591,6 +4594,191 @@
             "render": {
                 "width": 12,
                 "title": "Question",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ask question channel with blocks",
+            "description": "Ask a question in a slack channel using Block Kit blocks for the message body",
+            "verbose": "Posts a Block Kit message to a channel and returns a question ID that <b>get response</b> can use to retrieve the click. The <b>blocks</b> parameter takes the same JSON array format as <b>send message</b>. If the blocks include a <code>type: actions</code> block with buttons, each button's <code>action_id</code> becomes a valid response choice and SOAR tags that block with <code>block_id = soar_qid:&lt;qid&gt;:&lt;asset_id&gt;</code> so the click is correlated back to the pending question. If the blocks do not include an actions block, SOAR appends one built from the <b>responses</b> parameter (defaults to <code>yes,no</code>). The posted message does not use legacy attachments, so clicks arrive as modern <code>block_actions</code> payloads over Socket Mode (if enabled) or the Interactivity Request URL. <b>Note:</b> To use the bot in a private channel you need to invite the bot into the channel first.",
+            "type": "generic",
+            "identifier": "ask_question_channel_with_blocks",
+            "read_only": false,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {
+                "destination": {
+                    "description": "Channel (e.g. #channel-name or C1A1A1AAA) to ask question in",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "slack channel name",
+                        "slack channel id"
+                    ]
+                },
+                "blocks": {
+                    "description": "Block Kit blocks (JSON array string) rendered as the message body. Response buttons are added by SOAR below these blocks.",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "question": {
+                    "description": "Fallback notification / screenreader text. If omitted, a short string is derived from the first section/header block.",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "responses": {
+                    "description": "Comma-separated response button labels; only used if 'blocks' does NOT already contain a 'type: actions' block (max 5)",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "parent_message_ts": {
+                    "description": "Parent message timestamp to post the question as a threaded reply",
+                    "data_type": "string",
+                    "order": 4,
+                    "contains": [
+                        "slack message ts"
+                    ]
+                },
+                "reply_broadcast": {
+                    "description": "Used in conjunction with 'parent_message_ts'; makes the threaded reply visible in the channel",
+                    "data_type": "boolean",
+                    "order": 5
+                },
+                "replace_on_response": {
+                    "description": "After a user clicks a response button, replace the posted message in-place â€” drop the actions block and append a context block showing which button was pressed and by whom. Defaults to true.",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 6
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.destination",
+                    "data_type": "string",
+                    "contains": [
+                        "slack channel name",
+                        "slack channel id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.blocks",
+                    "data_type": "string",
+                    "column_name": "Blocks",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.question",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.responses",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.replace_on_response",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.parent_message_ts",
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.reply_broadcast",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.qid",
+                    "data_type": "string",
+                    "column_name": "Question ID",
+                    "column_order": 1,
+                    "contains": [
+                        "slack question id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.answer_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.channel",
+                    "data_type": "string",
+                    "contains": [
+                        "slack channel id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message_ts",
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ok",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.response",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.response_received",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Asked question in channel successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Question (Blocks)",
                 "type": "table",
                 "height": 5
             },
